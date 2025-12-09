@@ -14,9 +14,9 @@ $ADS = [
 <code>TCFbXKE25Q8iRu55fkqz8vxV7pvepyAnkz</code> （点击地址自动复制）
 ",
         'buttons' => [
-            ['text' => '按钮1', 'url' => 'https://example.com'],
-            ['text' => '按钮2', 'url' => 'https://example.com'],
-            ['text' => '按钮3', 'url' => 'https://example.com'],
+            ['text' => '🔗 3TRX能量', 'url' => 'https://t.me/lanmaonlBot'],
+            ['text' => '🤖 TG大会员', 'url' => 'https://t.me/asd89894'],
+            ['text' => '💬 联系客服', 'url' => 'https://t.me/asd89894'],
         ],
         'enabled' => true,
     ],
