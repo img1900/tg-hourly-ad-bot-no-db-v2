@@ -3,7 +3,7 @@ $BOT_TOKEN = getenv('TELEGRAM_BOT_TOKEN');
 
 $ADS = [
     [
-        'chat_id' => -1001234567890,
+        'chat_id' => -1003220922535,
         'type' => 'photo',
         'photo' => __DIR__ . '/ad_image.jpg',
         'text' => "✈️转账  3  TRX= 1笔能量—6TRX=2笔能量
