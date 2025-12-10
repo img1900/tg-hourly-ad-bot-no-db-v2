@@ -1,175 +1,166 @@
-# Telegram 自动发广告机器人（无数据库版）
+# Telegram 自动广告机器人（无数据库版，自动整点发送版）
 
-一个基于 **PHP + Zeabur + GitHub** 的轻量级 Telegram 自动发广告机器人。
-
-特点：
-
-- 纯文件配置 **无需数据库**
-- 支持 **定时自动发送广告**
-- 支持 **发送图片广告（sendPhoto）**
-- 广告可附带 **多个按钮（inline keyboard）**
-- 广告内容统一写在 `config.php`，非常容易修改
-- 适合 Zeabur 定时任务部署
+本项目是一个基于 **PHP + Zeabur + GitHub** 的自动广告发送机器人，使用 `loop.php` 自动对齐到整点运行，无需 Zeabur 定时任务，适用于免费套餐。
 
 ---
 
-## 🚀 功能说明
+## 🚀 功能特点
 
-该机器人支持：
-
-- 每小时自动发送广告（可通过定时任务调整频率）
-- 自动发送图片 + 文案（caption）
-- 文案支持 HTML 格式，如 `<code>` 用于可复制地址
-- 三个按钮（可自行修改文本和链接）
-- 支持多条广告（自由扩展）
+- 自动对齐整点发送广告（例如 00:00、01:00、02:00…）
+- 无需 Cron（适配 Zeabur 免费版）
+- 支持图片广告 + 文案（caption）
+- 支持多个按钮（inline keyboard）
+- 配置简单，所有内容在 `config.php` 修改
+- 无数据库，轻量稳定、高可用
 
 ---
 
-## 📦 项目结构
+## 📁 项目结构
 
 ```
-├── config.php         # 广告内容配置（重点）
-├── telegram.php       # 与 Telegram API 交互
-├── send_ads.php       # 定时执行入口
-├── ad_image.jpg       # 广告图片
-├── index.php          # 健康检查页面
-├── .gitignore
-└── README.md
+config.php       # 广告配置（chat_id、文案、按钮）
+telegram.php     # Telegram API 封装
+send_ads.php     # 单次广告发送逻辑
+loop.php         # 自动整点执行（核心）
+ad_image.jpg     # 广告图片
+index.php        # 健康检查
+README.md        # 项目说明
 ```
 
 ---
 
-## ✏️ 如何修改广告内容？
+## 🛠️ 部署步骤（Zeabur + GitHub）
 
-所有广告内容都在 `config.php`：
+### 1. 上传本项目到 GitHub
 
-- 修改文案（text）
-- 修改图片（photo）
-- 修改按钮（text + url）
-- 启用/禁用广告（enabled）
-
-你不需要懂 PHP，只改里面的值即可。
+确保文件结构完整。
 
 ---
 
-## 🧩 config.php 示例（简化版）
+### 2. 在 Zeabur 新建服务（选择 GitHub 仓库）
 
-```php
-$ADS = [
-    [
-        'chat_id' => -1001234567890,          // 群组ID
-        'type'    => 'photo',                 // photo 或 text
-        'photo'   => __DIR__ . '/ad_image.jpg',
-        'text'    => "这里写广告文案",
-        'buttons' => [
-            ['text' => '按钮1', 'url' => 'https://example.com'],
-            ['text' => '按钮2', 'url' => 'https://example.com'],
-            ['text' => '按钮3', 'url' => 'https://example.com'],
-        ],
-        'enabled' => true
-    ],
-];
-```
-
-修改完成后 **推送到 GitHub**，Zeabur 会自动重新部署。
+Zeabur 会自动识别为 PHP 项目。
 
 ---
 
-## 🌐 如何部署到 Zeabur？
-
-### **1️⃣ 上传项目到 GitHub**
-
-把 zip 解压 → 用 Git 推送到你的仓库。
-
----
-
-### **2️⃣ Zeabur 创建服务**
-
-- New Service → Import from GitHub  
-- 自动识别 PHP → 部署成功后打开 service
-
----
-
-### **3️⃣ 设置环境变量**
+### 3. 设置环境变量
 
 进入：
 
 ```
-Settings → Environment Variables
+设置 → 环境变量（Environment Variables）
 ```
 
 添加：
 
 ```
-TELEGRAM_BOT_TOKEN=你的机器人token
+TELEGRAM_BOT_TOKEN=你的BotToken
 ```
 
 ---
 
-### **4️⃣ 配置定时任务（Scheduled Jobs）**
+### 4. 修改启动命令（非常关键）
 
 进入：
 
 ```
-Scheduled Jobs → Add Job
+设置 → 启动命令（Start Command）
 ```
 
-Command 填：
+填入：
 
 ```
-php /app/send_ads.php
+php loop.php
 ```
 
-Cron 时间可以设置为：
+保存 → 重新部署（Redeploy）
 
-```
-0 * * * *   # 每小时执行一次
-```
+机器人启动后会：
+
+- 自动等待到下一次整点
+- 每小时整点执行一次发送任务
 
 ---
 
-## 🔍 测试是否正常运行
+## 🧠 自动整点发送如何工作？
 
-在 Zeabur 控制台运行：
+在 `loop.php` 中：
 
-```
-php /app/send_ads.php
-```
+1. 获取当前时间  
+2. 计算距离下一整点的秒数  
+3. sleep(剩余秒数)  
+4. 进入每小时循环 → sleep(3600)
 
-若群组收到广告，说明一切正常。
+这样无需 Zeabur Cron，也能做到「每小时整点发送」。
 
 ---
 
-## ❓ 如何获取群组 chat_id？
+## ✏️ 修改广告内容
 
-1. 把机器人拉进群组  
-2. 发一条消息  
-3. 浏览器打开：
+编辑 `config.php`：
+
+```php
+'chat_id' => -100xxxxxxxxxx,    // 群 ID
+'photo'   => __DIR__ . '/ad_image.jpg', 
+'text'    => "你的广告内容",
+'buttons' => [
+    ['text' => '按钮1', 'url' => 'https://example.com'],
+    ['text' => '按钮2', 'url' => 'https://example.com'],
+    ['text' => '按钮3', 'url' => 'https://example.com'],
+],
+```
+
+可修改内容包括：
+
+- 广告文案  
+- 按钮文字 + 链接  
+- 群组 chat_id  
+- 广告图片（替换 ad_image.jpg）  
+
+---
+
+## ❓ 如何获取 chat_id？
+
+1. 拉机器人进群  
+2. 群里随便发一句话  
+3. 在浏览器访问：
 
 ```
 https://api.telegram.org/bot<你的TOKEN>/getUpdates
 ```
 
-4. 查找：
+找到：
 
 ```
-message.chat.id
+"chat":{"id": -100xxxxxxxx }
 ```
 
 这就是群组 ID。
 
 ---
 
-## 📄 开源协议 & 备注
+## 🔍 测试机器人运行
 
-该项目为简单自动化脚本，你可自由修改、商用或扩展功能。
+在 Zeabur 控制台：
 
-如需增加更多广告、定时配置、按钮样式、图片轮播等功能，可联系 ChatGPT 帮助你继续扩展。
+```
+命令 → php send_ads.php
+```
+
+群里应立即收到一条广告。
 
 ---
 
-## ❤️ 作者
+## ❤️ 作者说明
 
-本项目由 ChatGPT 协助自动生成，并根据你的广告需求定制。
+本项目由 ChatGPT 辅助生成与优化，支持自由使用、商用与二次开发。
 
-如需继续优化机器人、加入多广告轮播、多语种版本、或者添加用户交互功能，我可以继续协助。
+如需扩展功能：
+
+- 多广告轮播  
+- 随机广告  
+- 指定每日某个小时发送  
+- Telegram 菜单  
+- Webhook 模式  
+
+都可以继续找我，我会帮你进一步升级你的机器人。
