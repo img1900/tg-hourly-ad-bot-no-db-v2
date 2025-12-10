@@ -153,7 +153,7 @@ https://api.telegram.org/bot<你的TOKEN>/getUpdates
 
 ## ❤️ 作者说明
 
-本项目由 ChatGPT 辅助生成与优化，支持自由使用、商用与二次开发。
+本项目由✈(https://t.me/JBsms) 辅助生成与优化，支持自由使用、商用与二次开发。
 
 如需扩展功能：
 
