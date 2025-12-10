@@ -8,18 +8,18 @@ foreach ($ADS as $ad) {
     if (empty($ad['enabled'])) continue;
 
     $chat_id = $ad['chat_id'];
-    $text = $ad['text'];
+    $photo   = $ad['photo'];
+    $text    = $ad['text'];
     $buttons = $ad['buttons'];
-    $photo = $ad['photo'];
 
+    // 纵向按钮
     $inlineKeyboard = [];
-    $row=[];
-    foreach($buttons as $b){
-        $row[]=['text'=>$b['text'],'url'=>$b['url']];
+    foreach ($buttons as $btn) {
+        $inlineKeyboard[] = [
+            ['text' => $btn['text'], 'url' => $btn['url']]
+        ];
     }
-    $inlineKeyboard[]=$row;
 
     tg_send_photo($chat_id, $photo, $text, $inlineKeyboard);
 }
-
-echo "Ads sent.";
+echo "Ads sent.\n";
